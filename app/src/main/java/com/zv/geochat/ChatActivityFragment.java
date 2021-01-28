@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.zv.geochat.service.ChatService;
+
+import java.util.Random;
 
 public class ChatActivityFragment extends Fragment {
     private static final String TAG = "ChatActivityFragment";
@@ -66,6 +69,25 @@ public class ChatActivityFragment extends Fragment {
             }
         });
 
+        Button btnSendConnectError = (Button) v.findViewById(R.id.btnSendConnectError);
+        btnSendConnectError.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Connect Error: 03", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                sendConnectError();
+            }
+        });
+
+        Button btnSendRandomID = (Button) v.findViewById(R.id.btnSendRandomID);
+        btnSendRandomID.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Sending Random ID...", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+                sendRandomID();
+            }
+        });
         edtMessage = (EditText) v.findViewById(R.id.edtMessage);
 
         loadUserNameFromPreferences();
@@ -112,4 +134,22 @@ public class ChatActivityFragment extends Fragment {
         getActivity().startService(intent);
     }
 
+    private void sendConnectError(){
+        Bundle data = new Bundle();
+        data.putInt(ChatService.MSG_CMD, ChatService.CONNECT_ERROR_03);
+        Intent intent = new Intent(getContext(), ChatService.class);
+        intent.putExtras(data);
+        getActivity().startService(intent);
+    }
+
+    private void sendRandomID(){
+        Random rand = new Random();
+        int randomlyGeneratedID = rand.nextInt((9999 - 01) + 1) + 01;
+        Bundle data = new Bundle();
+        data.putInt(ChatService.MSG_CMD, ChatService.SEND_RANDOM_ID);
+        data.putString(ChatService.RANDOMLY_GENERATED_ID, String.valueOf(randomlyGeneratedID));
+        Intent intent = new Intent(getContext(), ChatService.class);
+        intent.putExtras(data);
+        getActivity().startService(intent);
+    }
 }
